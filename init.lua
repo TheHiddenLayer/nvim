@@ -24,17 +24,6 @@ vim.opt.scrolloff = 18
 vim.opt.sidescrolloff = 3
 --vim.opt.statusline = "%{expand('%:.')}" -- display relative file path
 
--- Helpers
-local function change_colorscheme()
-	local m = vim.fn.system("defaults read -g AppleInterfaceStyle")
-	m = m:gsub("%s+", "") -- trim whitespace
-	if m == "Dark" then
-		vim.o.background = "dark"
-	else
-		vim.o.background = "light"
-	end
-end
-
 -- Basic mappings
 vim.keymap.set("n", "<C-H>", "<C-W><C-H>")
 vim.keymap.set("n", "<C-J>", "<C-W><C-J>")
@@ -142,26 +131,6 @@ require("lazy").setup({
 	{
 		"nvim-telescope/telescope.nvim",
 		event = "VeryLazy",
-		-- opts = {
-		-- 	pickers = {
-		-- 		git_branches = { previewer = false, theme = "ivy", show_remote_tracking_branches = false },
-		-- 		git_commits = { previewer = false, theme = "ivy" },
-		-- 		grep_string = { previewer = false, theme = "ivy" },
-		-- 		diagnostics = { previewer = false, theme = "ivy" },
-		-- 		find_files = { previewer = false, theme = "ivy" },
-		-- 		oldfiles = { previewer = false, theme = "ivy", cwd_only = true },
-		-- 		buffers = { previewer = false, theme = "ivy" },
-		-- 		current_buffer_fuzzy_find = { theme = "ivy" },
-		-- 		resume = { previewer = false, theme = "ivy" },
-		-- 		live_grep = { theme = "ivy" },
-		-- 	},
-		-- 	defaults = {
-		-- 		sorting_strategy = "ascending",
-		-- 		layout_config = {
-		-- 			prompt_position = "top",
-		-- 		},
-		-- 	},
-		-- },
 		keys = {
 			{ "<leader>z", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "File fuzzy find" },
 			{ "<leader>d", "<cmd>Telescope diagnostics<cr>", desc = "Show diagnostics" },
@@ -201,7 +170,6 @@ require("lazy").setup({
 		lazy = false,
 		priority = 1000,
 		config = function()
-			-- change_colorscheme()
 			vim.cmd("colorscheme tokyobones")
 		end,
 	},
@@ -212,18 +180,6 @@ require("lazy").setup({
 		lazy = true,
 		event = "VeryLazy",
 		opts = {},
-	},
-
-	-- For formatting code
-	{
-		"stevearc/conform.nvim",
-		opts = {
-			formatters_by_ft = {
-				json = { "prettierd" },
-				lua = { "stylua" },
-			},
-			format_on_save = {},
-		},
 	},
 
 	{
@@ -255,74 +211,6 @@ require("lazy").setup({
 			disable_filetype = { "TelescopePrompt", "vim" },
 		},
 	},
-
-	-- Gitsigns
-	{
-		"lewis6991/gitsigns.nvim",
-		config = function()
-			require("gitsigns").setup({
-				on_attach = function(bufnr)
-					local gs = package.loaded.gitsigns
-
-					local function map(mode, l, r, opts)
-						opts = opts or {}
-						opts.buffer = bufnr
-						vim.keymap.set(mode, l, r, opts)
-					end
-
-					-- Navigation
-					map("n", "]c", function()
-						if vim.wo.diff then
-							return "]c"
-						end
-						vim.schedule(function()
-							gs.next_hunk()
-						end)
-						return "<Ignore>"
-					end, { expr = true })
-
-					map("n", "[c", function()
-						if vim.wo.diff then
-							return "[c"
-						end
-						vim.schedule(function()
-							gs.prev_hunk()
-						end)
-						return "<Ignore>"
-					end, { expr = true })
-
-					-- Actions
-					map("n", "<leader>hs", gs.stage_hunk)
-					map("n", "<leader>hr", gs.reset_hunk)
-					map("v", "<leader>hs", function()
-						gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-					end)
-					map("v", "<leader>hr", function()
-						gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-					end)
-					map("n", "<leader>hS", gs.stage_buffer)
-					map("n", "<leader>hu", gs.undo_stage_hunk)
-					map("n", "<leader>hR", gs.reset_buffer)
-					map("n", "<leader>hp", gs.preview_hunk)
-					map("n", "<leader>hb", function()
-						gs.blame_line({ full = true })
-					end)
-					map("n", "<leader>gb", function()
-						gs.blame({ full = true })
-					end)
-					map("n", "<leader>tb", gs.toggle_current_line_blame)
-					map("n", "<leader>hd", gs.diffthis)
-					map("n", "<leader>hD", function()
-						gs.diffthis("~")
-					end)
-					map("n", "<leader>td", gs.toggle_deleted)
-
-					-- Text object
-					map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")
-				end,
-			})
-		end,
-	},
 })
 
 -- Set up Telescope.nvim
@@ -341,14 +229,14 @@ require('telescope').setup {
 -- load_extension, somewhere after setup function:
 require('telescope').load_extension('fzf')
 
--- Open Telescope on start
-vim.api.nvim_create_autocmd("VimEnter", {
-	callback = function()
-		if vim.fn.argv(0) == "" then
-			require("telescope.builtin").oldfiles({ cwd_only = true })
-		end
-	end,
-})
+-- -- Open Telescope on start
+-- vim.api.nvim_create_autocmd("VimEnter", {
+-- 	callback = function()
+-- 		if vim.fn.argv(0) == "" then
+-- 			require("telescope.builtin").oldfiles({ cwd_only = true })
+-- 		end
+-- 	end,
+-- })
 
 -- Set up Comment.nvim
 require("Comment").setup({

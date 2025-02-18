@@ -229,14 +229,14 @@ require('telescope').setup {
 -- load_extension, somewhere after setup function:
 require('telescope').load_extension('fzf')
 
--- -- Open Telescope on start
--- vim.api.nvim_create_autocmd("VimEnter", {
--- 	callback = function()
--- 		if vim.fn.argv(0) == "" then
--- 			require("telescope.builtin").oldfiles({ cwd_only = true })
--- 		end
--- 	end,
--- })
+-- Open Telescope on start
+vim.api.nvim_create_autocmd("VimEnter", {
+	callback = function()
+		if vim.fn.argv(0) == "" then
+			require("telescope.builtin").oldfiles({ cwd_only = true })
+		end
+	end,
+})
 
 -- Set up Comment.nvim
 require("Comment").setup({
